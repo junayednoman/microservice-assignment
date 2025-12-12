@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { router } from "./routes";
 
 const app = express();
 const port = 5001;
@@ -14,8 +15,10 @@ app.use(
   })
 );
 
+app.use("/api/courses", router);
+
 app.get("/health", (req, res) => {
-  res.send("Course service is alive!");
+  res.send("Course service is running!");
 });
 
 app.listen(port, () => {
