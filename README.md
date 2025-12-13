@@ -51,21 +51,43 @@ This setup ensures **strong data consistency**, **prevents race conditions**, an
 
 ## Folder Structure
 ```
-├── course-service
-│ ├── src
-│ ├── Dockerfile
-│ ├── package.json
-│ └── ...
-├── order-service
-│ ├── src
-│ ├── Dockerfile
-│ ├── package.json
-│ └── ...
-├── docker-compose.yml
-├── Assignment ERD.png
-└── README.md
-```
+course-service
+├── dist/               # Compiled JavaScript output (after build)
+├── node_modules/       # Project dependencies
+├── src/                # Application source code
+│ ├── controllers.ts    # Handles incoming API requests
+│ ├── cron.ts           # Cron jobs (reservation expiry, cleanup tasks)
+│ ├── routes.ts         # API route definitions
+│ ├── services.ts       # Business logic (seat reservation, pricing)
+│ ├── models.ts         # Data models / in-memory storage
+│ ├── interface.ts      # TypeScript interfaces & types
+│ └── index.ts          # Application entry point
+├── .dockerignore       # Files ignored by Docker
+├── .gitignore          # Files ignored by Git
+├── Dockerfile          # Docker build configuration
+├── package-lock.json   # Locked dependency versions
+├── package.json        # Project metadata & scripts
+└── tsconfig.json       # TypeScript configuration
 
+order-service
+├── dist/               # Compiled JavaScript output (after build)
+├── node_modules/       # Project dependencies
+├── src/                # Application source code
+│ ├── controllers.ts    # Request handlers (business logic entry points)
+│ ├── routes.ts         # API route definitions
+│ ├── services.ts       # Core business logic & service layer
+│ ├── models.ts         # Data models / schemas
+│ ├── interface.ts      # TypeScript interfaces & types
+│ └── index.ts          # Application entry point
+├── .dockerignore       # Files ignored by Docker
+├── .env                # Environment variables (local)
+├── .env.example        # Example env file for setup
+├── .gitignore          # Files ignored by Git
+├── Dockerfile          # Docker build configuration
+├── package-lock.json   # Locked dependency versions
+├── package.json        # Project metadata & scripts
+└── tsconfig.json       # TypeScript configuration
+```
 
 ---
 
