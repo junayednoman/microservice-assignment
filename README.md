@@ -17,7 +17,7 @@ This setup ensures **strong data consistency**, **prevents race conditions**, an
 ---
 
 ## ERD
-![ERD](/architecture.png)
+![ERD](https://i.postimg.cc/rszSr65Q/Assignment-ERD.png)
 
 
 ## Key Features
