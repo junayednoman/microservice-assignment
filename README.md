@@ -17,7 +17,7 @@ This setup ensures **strong data consistency**, **prevents race conditions**, an
 ---
 
 ## ERD
-![ERD](./architecture.png)
+![ERD](/architecture.png)
 
 
 ## Key Features
@@ -117,15 +117,14 @@ docker-compose down
 ## How to Test
 
 1. Start services via Docker Compose.
-2. Use Postman or curl to:
-- Create courses in Course Service.
-- Reserve and confirm seats.
-- Place orders via Order Service.
+2. Use Postman to:
+ - Create courses in Course Service.
+ - Reserve and confirm seats.
+ - Place orders via Order Service.
 3. Test race conditions by simulating multiple users trying to reserve the last seat simultaneously.
 4. Check health endpoints:
-
-- ``` http://localhost:5001/api/health ```
-- ``` http://localhost:5002/api/health ```
+ - ``` http://localhost:5001/api/health ```
+ - ``` http://localhost:5002/api/health ```
 
 ## Notes
 
