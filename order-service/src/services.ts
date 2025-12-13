@@ -10,7 +10,7 @@ export const callWithRetry = async <T>(
   requestFn: () => Promise<T>,
   retries = 3,
   delayMs = 300
-): Promise<T> => {
+) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       return await requestFn();
@@ -29,8 +29,6 @@ export const callWithRetry = async <T>(
       await new Promise((r) => setTimeout(r, delayMs));
     }
   }
-
-  throw new Error("Retry failed");
 };
 
 const createOrder = async (payload: TOrder) => {

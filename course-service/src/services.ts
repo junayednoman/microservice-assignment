@@ -2,6 +2,8 @@ import { ReservationStatus, TCourse, TReservation } from "./interface";
 import { v4 as uuidv4 } from "uuid";
 import { courses, reservations } from "./models";
 
+const courseLocks: Record<string, boolean> = {};
+
 const createCourse = (payload: TCourse) => {
   payload.id = uuidv4();
   payload.createdAt = new Date();
@@ -28,23 +30,33 @@ const updateCoursePrice = (id: string, price: number) => {
   return course;
 };
 
-const reserveSeat = (id: string): TReservation => {
-  const course = courses.find((c) => c.id === id);
-  if (!course) throw new Error("Invalid course id!");
-  if (course.availableSeats <= 0) throw new Error("No seats available!");
+const reserveSeat = async (id: string) => {
+  while (courseLocks[id]) {
+    await new Promise((r) => setTimeout(r, 10));
+  }
 
-  const reservationPayload: TReservation = {
-    id: uuidv4(),
-    courseId: course.id,
-    lockedPrice: course.price,
-    status: ReservationStatus.RESERVED,
-    expiresAt: new Date(Date.now() + 3 * 60 * 1000),
-  };
+  courseLocks[id] = true;
 
-  reservations.push(reservationPayload);
+  try {
+    const course = courses.find((c) => c.id === id);
+    if (!course) throw new Error("Invalid course id!");
+    if (course.availableSeats <= 0) throw new Error("No seats available!");
 
-  course.availableSeats -= 1;
-  return reservationPayload;
+    const reservationPayload: TReservation = {
+      id: uuidv4(),
+      courseId: course.id,
+      lockedPrice: course.price,
+      status: ReservationStatus.RESERVED,
+      expiresAt: new Date(Date.now() + 3 * 60 * 1000),
+    };
+
+    reservations.push(reservationPayload);
+    course.availableSeats -= 1;
+
+    return reservationPayload;
+  } finally {
+    courseLocks[id] = false;
+  }
 };
 
 const confirmReservation = (id: string) => {
@@ -67,7 +79,7 @@ const cancelReservation = (id: string) => {
 
   const course = courses.find((c) => c.id === reservation.courseId);
   if (!course) throw new Error("Invalid course id!");
-  
+
   if (reservation.expiresAt < new Date()) {
     course.availableSeats += 1;
     reservation.status = ReservationStatus.EXPIRED;
