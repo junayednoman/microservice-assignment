@@ -18,7 +18,7 @@ app.use(
 
 app.use("/api/courses", router);
 
-app.get("/health", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.send("Course service is running!");
 });
 

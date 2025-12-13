@@ -6,25 +6,31 @@ import { orders } from "./models";
 
 const courserApiUrl = process.env.COURSE_API_URL;
 
-const fetchCourseWithRetry = async (
-  courseId: string,
+export const callWithRetry = async <T>(
+  requestFn: () => Promise<T>,
   retries = 3,
-  delay = 200
-) => {
-  for (let i = 0; i < retries; i++) {
+  delayMs = 300
+): Promise<T> => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const res = await axios.get(`${courserApiUrl}/${courseId}`);
-      if (!res?.data?.data) throw new Error("Invalid course id!");
-      return res.data.data;
+      return await requestFn();
     } catch (err: any) {
-      if (err.message.includes("Invalid"))
-        throw new Error("Invalid course id!");
-      if (i === retries - 1) {
-        throw new Error("Course Service unavailable! Try again later.");
+      console.log("attempt, ", err);
+      const status = err?.response?.status;
+
+      if (status && status < 500) {
+        throw err;
       }
-      await new Promise((r) => setTimeout(r, delay));
+
+      if (attempt === retries) {
+        throw new Error("Course service unavailable!");
+      }
+
+      await new Promise((r) => setTimeout(r, delayMs));
     }
   }
+
+  throw new Error("Retry failed");
 };
 
 const createOrder = async (payload: TOrder) => {
@@ -39,11 +45,12 @@ const createOrder = async (payload: TOrder) => {
   payload.id = uuidv4();
   payload.createdAt = new Date();
 
-  await fetchCourseWithRetry(payload.courseId);
+  await callWithRetry(() => axios.get(`${courserApiUrl}/${payload.courseId}`));
 
   const reserveRes = await axios.patch(
     `${courserApiUrl}/${payload.courseId}/reserveSeat`
   );
+
   if (!reserveRes?.data?.success)
     throw new Error(reserveRes?.data?.message || "Error reserving seat!");
 
@@ -51,8 +58,8 @@ const createOrder = async (payload: TOrder) => {
   payload.priceAtPurchase = reserveRes.data.data.lockedPrice;
 
   try {
-    const confirmRes = await axios.patch(
-      `${courserApiUrl}/${reservationId}/confirmReservation`
+    const confirmRes = await callWithRetry(() =>
+      axios.patch(`${courserApiUrl}/${reservationId}/confirmReservation`)
     );
     if (!confirmRes?.data?.success)
       throw new Error(
@@ -62,7 +69,10 @@ const createOrder = async (payload: TOrder) => {
     orders.push(payload);
     return payload;
   } catch (err: any) {
-    await axios.patch(`${courserApiUrl}/${reservationId}/cancelReservation`);
+    await callWithRetry(
+      () => axios.patch(`${courserApiUrl}/${reservationId}/cancelReservation`),
+      1
+    );
     throw new Error(`Order failed: ${err.message || err}`);
   }
 };

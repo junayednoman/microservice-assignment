@@ -16,7 +16,7 @@ app.use(
 
 app.use("/api/orders", router);
 
-app.get("/health", (req, res) => {
+app.get("/api/health", (_req, res) => {
   res.send("Order service is running!");
 });
 
