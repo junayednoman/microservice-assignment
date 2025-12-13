@@ -1,6 +1,6 @@
-import { TCourse } from "./interface";
+import { ReservationStatus, TCourse, TReservation } from "./interface";
 import { v4 as uuidv4 } from "uuid";
-import { courses } from "./models";
+import { courses, reservations } from "./models";
 
 const createCourse = (payload: TCourse) => {
   payload.id = uuidv4();
@@ -28,13 +28,54 @@ const updateCoursePrice = (id: string, price: number) => {
   return course;
 };
 
-const reserveSeat = (id: string): TCourse => {
+const reserveSeat = (id: string): TReservation => {
   const course = courses.find((c) => c.id === id);
   if (!course) throw new Error("Invalid course id!");
   if (course.availableSeats <= 0) throw new Error("No seats available!");
 
+  const reservationPayload: TReservation = {
+    id: uuidv4(),
+    courseId: course.id,
+    lockedPrice: course.price,
+    status: ReservationStatus.RESERVED,
+    expiresAt: new Date(Date.now() + 3 * 60 * 1000),
+  };
+
+  reservations.push(reservationPayload);
+
   course.availableSeats -= 1;
-  return course;
+  return reservationPayload;
+};
+
+const confirmReservation = (id: string) => {
+  const reservation = reservations.find((r) => r.id === id);
+  if (!reservation) throw new Error("Invalid reservation id!");
+  if (reservation.expiresAt < new Date()) {
+    const course = courses.find((c) => c.id === reservation.courseId);
+    if (course) course.availableSeats += 1;
+    reservation.status = ReservationStatus.EXPIRED;
+    throw new Error("Reservation expired!");
+  }
+
+  reservation.status = ReservationStatus.CONFIRMED;
+  return reservation;
+};
+
+const cancelReservation = (id: string) => {
+  const reservation = reservations.find((r) => r.id === id);
+  if (!reservation) throw new Error("Invalid reservation id!");
+
+  const course = courses.find((c) => c.id === reservation.courseId);
+  if (!course) throw new Error("Invalid course id!");
+  
+  if (reservation.expiresAt < new Date()) {
+    course.availableSeats += 1;
+    reservation.status = ReservationStatus.EXPIRED;
+    return reservation;
+  }
+  course.availableSeats += 1;
+  reservation.status = ReservationStatus.CANCELLED;
+  return reservation;
 };
 
 export const services = {
@@ -43,4 +84,6 @@ export const services = {
   getSingleCourse,
   updateCoursePrice,
   reserveSeat,
+  confirmReservation,
+  cancelReservation,
 };

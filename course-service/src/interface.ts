@@ -7,3 +7,18 @@ export interface TCourse {
   instructorName: string;
   createdAt: Date;
 }
+
+export enum ReservationStatus {
+  RESERVED = "RESERVED",
+  CONFIRMED = "CONFIRMED",
+  EXPIRED = "EXPIRED",
+  CANCELLED = "CANCELLED",
+}
+
+export interface TReservation {
+  id: string;
+  courseId: string;
+  lockedPrice: number;
+  status: ReservationStatus;
+  expiresAt: Date;
+}

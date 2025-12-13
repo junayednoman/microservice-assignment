@@ -89,10 +89,46 @@ const reserveSeat = (req: Request, res: Response) => {
   }
 };
 
+const confirmReservation = (req: Request, res: Response) => {
+  try {
+    const result = services.confirmReservation(req.params.id as string);
+    res.status(200).json({
+      success: true,
+      message: "Reservation confirmed successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+      statusCode: 500,
+    });
+  }
+};
+
+const cancelReservation = (req: Request, res: Response) => {
+  try {
+    const result = services.cancelReservation(req.params.id as string);
+    res.status(200).json({
+      success: true,
+      message: "Reservation cancelled successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Something went wrong",
+      statusCode: 500,
+    });
+  }
+};
+
 export const controllers = {
   createCourse,
   getAllCourses,
   getSingleCourse,
   updateCoursePrice,
   reserveSeat,
+  confirmReservation,
+  cancelReservation,
 };

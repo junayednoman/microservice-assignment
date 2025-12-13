@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { router } from "./routes";
+import "./cron";
 
 const app = express();
 const port = 5001;
@@ -11,7 +12,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000"],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
 
