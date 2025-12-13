@@ -12,10 +12,6 @@ const createCourse = (payload: TCourse) => {
   return payload;
 };
 
-const getAllCourses = () => {
-  return courses;
-};
-
 const getSingleCourse = (id: string) => {
   const course = courses.find((course) => course.id === id);
 
@@ -92,7 +88,6 @@ const cancelReservation = (id: string) => {
 
 export const services = {
   createCourse,
-  getAllCourses,
   getSingleCourse,
   updateCoursePrice,
   reserveSeat,

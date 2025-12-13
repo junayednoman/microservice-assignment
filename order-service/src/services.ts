@@ -75,9 +75,6 @@ const createOrder = async (payload: TOrder) => {
   }
 };
 
-const getAllOrders = () => orders;
-
 export const services = {
   createOrder,
-  getAllOrders,
 };

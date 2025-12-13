@@ -22,29 +22,6 @@ const createOrder = async (req: Request, res: Response) => {
   }
 };
 
-const getAllOrders = (_req: Request, res: Response) => {
-  try {
-    const result = services.getAllOrders();
-
-    res.status(200).json({
-      success: true,
-      message: "Orders fetched successfully",
-      data: result,
-    });
-  } catch (error: any) {
-    const statusCode = error.status || 500;
-    res.status(statusCode).json({
-      success: false,
-      message:
-        error.response?.data?.message ||
-        error.message ||
-        "Something went wrong",
-      statusCode: statusCode,
-    });
-  }
-};
-
 export const controllers = {
   createOrder,
-  getAllOrders,
 };
