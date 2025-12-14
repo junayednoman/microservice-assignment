@@ -141,7 +141,6 @@ docker-compose down
 1. Start services via Docker Compose.
 2. Use Postman to:
  - Create courses in Course Service.
- - Reserve and confirm seats.
  - Place orders via Order Service.
 3. Test race conditions by simulating multiple users trying to reserve the last seat simultaneously.
 4. Check health endpoints:
